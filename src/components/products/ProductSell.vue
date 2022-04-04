@@ -1,5 +1,11 @@
 <template>
   <div class="container">
+    <div class="loading" :style="isLoading">
+      <div class="lds-ripple">
+        <div></div>
+        <div></div>
+      </div>
+    </div>
     <div class="row">
       <div class="col-6 offset-3 pt-3 card mt-5 shadow">
         <div class="card-body">
@@ -11,7 +17,6 @@
               @change="productSelected"
               v-model="selectedProduct"
               class="form-control"
-              
             >
               <option selected disabled>Ürün Seçiniz..</option>
               <option
@@ -49,13 +54,14 @@
           <div class="form-group">
             <label>Adet</label>
             <input
+              v-model="product_count"
               type="text"
               class="form-control"
               placeholder="Ürün adetini giriniz.."
             />
           </div>
           <hr />
-          <button class="btn btn-primary">Kaydet</button>
+          <button class="btn btn-primary" :disabled="saveEnabled" @click="save">Kaydet</button>
         </div>
       </div>
     </div>
@@ -63,22 +69,62 @@
 </template>
 <script>
 import { mapGetters } from "vuex";
+import {loadingMixin} from '../../loadingMixin';
+
 export default {
   data() {
     return {
       selectedProduct: null,
       product: null,
+      product_count: null,
+      saveButtonClick : false
     };
   },
+  mixins:[loadingMixin],
   computed: {
     ...mapGetters(["getProducts", "getProduct"]),
+     saveEnabled() {
+      if (
+        this.selectedProduct !== null &&
+        this.product_count > 0 &&
+        this.product.price > 0 &&
+        this.product.description.length > 0
+      ) {
+        return false;
+      } else {
+        return true;
+      }
+    }
   },
   methods: {
     productSelected() {
       console.log(this.selectedProduct);
       this.product = this.$store.getters.getProduct(this.selectedProduct)[0];
     },
+    save() {
+      this.saveButtonClick = true;
+      let product = {
+        key: this.selectedProduct,
+        count: this.product_count,
+      };
+      this.$store.dispatch("sellProduct", product);
+    },
   },
+  beforeRouteLeave(to, from, next) {
+      if ((this.selectedProduct !== null || this.product_count > 0) && !this.saveButtonClick) {
+        if (
+          confirm(
+            "Kaydedilmemiş değişiklikler var çıkmak istediğinize emin misiniz?"
+          )
+        ) {
+          next();
+        } else {
+          next(false);
+        }
+      } else {
+        next();
+      }
+    },
 };
 </script>
 <style scoped>

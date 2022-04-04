@@ -12,6 +12,7 @@
 import Header from "./components/shared/Header.vue";
 
 import Footer from "./components/shared/Footer.vue";
+
 export default {
   components: {
     appHeader: Header,
@@ -20,22 +21,29 @@ export default {
   created() {
     this.$store.dispatch("getTradeResult");
     this.$store.dispatch("initApp");
+
+
   },
 };
 </script>
 
 <style scoped>
-body{
+body {
   background-color: #a7a0bb5c;
 }
-.fade-enter{
+
+.fade-enter {
   opacity: 0;
 }
-.fade-enter-active{
+
+.fade-enter-active {
   transition: opacity .5s ease-out;
 }
-.fade-leave{}
-.fade-leave-active{
+
+.fade-leave {
+}
+
+.fade-leave-active {
   transition: opacity .5s ease-out;
   opacity: 0;
 }

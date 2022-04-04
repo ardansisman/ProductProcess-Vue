@@ -62,6 +62,7 @@
   </div>
 </template>
 <script>
+import { loadingMixin } from "../../loadingMixin";
 export default {
   data() {
     return {
@@ -74,13 +75,7 @@ export default {
       saveButtonClick: false,
     };
   },
-  methods: {
-    saveProduct() {
-      this.saveButtonClick = true;
-      this.loading = true;
-      this.$store.dispatch("saveProduct", this.product);
-    },
-  },
+  mixins: [loadingMixin],
   computed: {
     saveEnabled() {
       if (
@@ -94,18 +89,15 @@ export default {
         return true;
       }
     },
-    isLoading() {
-      if (this.saveButtonClick) {
-        return {
-          display: "block",
-        };
-      } else {
-        return {
-          display: "none",
-        };
-      }
+  },
+  methods: {
+    saveProduct() {
+      this.saveButtonClick = true;
+      this.loading = true;
+      this.$store.dispatch("saveProduct", this.product);
     },
   },
+
   beforeRouteLeave(to, from, next) {
     setTimeout(() => {
       this.loading = false;
